@@ -22,8 +22,7 @@ export class AuthService {
     return this.http.post<User>(`${this.apiUrl}/AuthManagement/Login`, { Email, Password }).pipe(
       tap(user => {
         if (user && user.token) {
-          // If login successful, store user details in local storage or a cookie
-          // localStorage.setItem('currentUser', JSON.stringify(user));
+          localStorage.setItem('currentUser', JSON.stringify(user));
           this.loggedIn.next(true);
         }
       })
@@ -32,7 +31,7 @@ export class AuthService {
 
   logout(): void {
     // Clear user details from local storage or a cookie
-    // localStorage.removeItem('currentUser');
+    localStorage.removeItem('currentUser');
     this.loggedIn.next(false);
   }
 
@@ -41,10 +40,18 @@ export class AuthService {
   }
 
   private checkTokenValidity(): void {
-    // Check if user is already logged in (for example, from local storage)
-    // const user: User | null = JSON.parse(localStorage.getItem('currentUser') || '{}');
-    // if (user && user.token) {
-    //   this.loggedIn.next(true);
-    // }
+    if (typeof localStorage !== 'undefined') {
+      const user: User | null = JSON.parse(localStorage.getItem('currentUser') || '{}');
+      if (user && user.token) {
+        this.loggedIn.next(true);
+      }
+    } else {
+      console.warn('localStorage is not available in this environment');
+    }
+  }
+
+  getToken(): string | null {
+    const currentUser = localStorage.getItem('currentUser');
+    return currentUser ? JSON.parse(currentUser).token : null;
   }
 }

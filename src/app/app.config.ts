@@ -1,14 +1,20 @@
-import {ApplicationConfig, importProvidersFrom} from '@angular/core';
-import {provideRouter, RouterModule} from '@angular/router';
-
+import {ApplicationConfig} from '@angular/core';
+import {provideRouter} from '@angular/router';
 import { routes } from './app.routes';
 import { provideClientHydration } from '@angular/platform-browser';
-import {provideHttpClient} from "@angular/common/http";
+import {HTTP_INTERCEPTORS, provideHttpClient, withInterceptors, withInterceptorsFromDi} from "@angular/common/http";
+import {JwtInterceptor} from "./core/interceptors/jwt.interceptor";
+import {spinnerInterceptor} from "./core/interceptors/spinner.interceptor";
+import {authInterceptor} from "./core/interceptors/auth.interceptor";
 
 export const appConfig: ApplicationConfig = {
   providers:[
     provideRouter(routes),
     provideClientHydration(),
-    provideHttpClient(),
+    provideHttpClient(
+      withInterceptorsFromDi(),
+      withInterceptors([spinnerInterceptor, authInterceptor])
+    ),
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true }
   ]
 };
