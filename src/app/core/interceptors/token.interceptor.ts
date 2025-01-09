@@ -23,7 +23,7 @@ export class TokenInterceptor implements HttpInterceptor {
             switchMap((refreshResponse: any) => {
               const newRequest = request.clone({
                 setHeaders: {
-                  Authorization: `Bearer ${refreshResponse.accessToken}`
+                  Authorization: `Bearer ${refreshResponse.token}`
                 }
               });
               return next.handle(newRequest);
